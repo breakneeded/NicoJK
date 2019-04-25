@@ -404,7 +404,9 @@ bool GetProcessOutput(LPCTSTR commandLine, LPCTSTR currentDir, char *buf, size_t
 			si.dwFlags = STARTF_USESTDHANDLES;
 			si.hStdOutput = hWritePipe;
 			PROCESS_INFORMATION pi;
-			std::vector<TCHAR> commandLineBuf(commandLine, commandLine + _tcslen(commandLine) + 1);
+			DWORD requiredBufSize = ExpandEnvironmentStrings(commandLine, NULL, 0);
+			std::vector<TCHAR> commandLineBuf(requiredBufSize + 1);
+			ExpandEnvironmentStrings(commandLine, commandLineBuf.data(), requiredBufSize);
 			if (CreateProcess(nullptr, commandLineBuf.data(), nullptr, nullptr, TRUE, CREATE_NO_WINDOW, nullptr, currentDir, &si, &pi)) {
 				size_t bufCount = 0;
 				bool bBreak = false;
